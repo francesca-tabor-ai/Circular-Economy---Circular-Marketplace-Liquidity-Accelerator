@@ -1,0 +1,8 @@
+{
+  "name": "Circular Marketplace Liquidity Accelerator (CMLA)",
+  "description": "A high-performance platform for circular economy marketplace founders to reach transaction liquidity fast using AI-driven supply lock-in and demand seeding strategies.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
