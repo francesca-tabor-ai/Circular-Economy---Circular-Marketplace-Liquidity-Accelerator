@@ -1,9 +1,14 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { View, Supplier, Buyer, LiquidityInsight, ChatMessage, GeneratedAsset } from './types';
 import StatCard from './components/StatCard';
 import LiquidityChart from './components/LiquidityChart';
 import { getLiquidityInsights, generateOutreachPlaybook, createFounderChat, generateMarketplaceImage, generateDemandStrategy, getApiKeyError } from './services/geminiService';
+
+// Lazy image component for better performance
+const LazyImage: React.FC<{ src: string; alt: string; className?: string }> = ({ src, alt, className }) => (
+  <img src={src} alt={alt} className={className} loading="lazy" />
+);
 
 const FOUNDER_IMAGE_URL = "https://i.postimg.cc/HjfLFvxr/1-Aries-Circular-Marketplace-Liquidity-Accelerator-(CMLA).png";
 
@@ -35,6 +40,11 @@ const App: React.FC = () => {
   
   // Error State
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Scroll to top when view changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentView]);
 
   // Initialize Chat Session
   useEffect(() => {
@@ -242,10 +252,18 @@ const App: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="stagger-item">
         <StatCard title="Transactions (Wk)" value="42" change="+12%" trend="up" icon="fa-bolt-lightning" />
+        </div>
+        <div className="stagger-item">
         <StatCard title="Supply Lock-in" value="68%" change="+5%" trend="up" icon="fa-shield-halved" />
+        </div>
+        <div className="stagger-item">
         <StatCard title="Demand Coverage" value="1.2x" change="-0.1x" trend="down" icon="fa-chart-line" />
+        </div>
+        <div className="stagger-item">
         <StatCard title="Time-to-Match" value="1.4d" change="Faster" trend="up" icon="fa-hourglass-start" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -259,7 +277,7 @@ const App: React.FC = () => {
           <LiquidityChart />
         </div>
         
-        <div className="bg-[#0a2540] text-white p-8 rounded-xl flex flex-col shadow-xl ring-1 ring-slate-800">
+        <div className="bg-[#0a2540] text-white p-8 rounded-xl flex flex-col shadow-xl ring-1 ring-slate-800 card-micro">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h3 className="text-xl font-bold">AI Strategist</h3>
@@ -778,13 +796,13 @@ const App: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <button
               onClick={() => setCurrentView('Dashboard')}
-              className="stripe-gradient px-8 py-4 rounded-xl text-white font-bold text-base shadow-xl shadow-emerald-500/20 hover:opacity-90 transition-all uppercase tracking-widest"
+              className="stripe-gradient px-8 py-4 rounded-xl text-white font-bold text-base shadow-xl shadow-emerald-500/20 hover:opacity-90 transition-all uppercase tracking-widest btn-micro"
             >
               Start Your Liquidity Sprint
             </button>
             <button
               onClick={() => setIsChatOpen(true)}
-              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 px-8 py-4 rounded-xl text-white font-bold text-base hover:bg-white/20 transition-all uppercase tracking-widest"
+              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 px-8 py-4 rounded-xl text-white font-bold text-base hover:bg-white/20 transition-all uppercase tracking-widest btn-micro"
             >
               Talk to the Founder AI
             </button>
@@ -1447,13 +1465,13 @@ interface SidebarItemProps {
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, active, onClick }) => (
   <button 
     onClick={onClick}
-    className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 group ${
+    className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-xl text-sm font-bold transition-all duration-200 group micro-interaction ${
       active 
         ? 'bg-[#0a2540] text-white shadow-xl shadow-slate-200' 
         : 'text-[#6b7280] hover:bg-[#f3f4f6] hover:text-[#0a2540]'
     }`}
   >
-    <i className={`fas ${icon} w-5 text-base ${active ? 'text-emerald-400' : 'text-slate-300 group-hover:text-[#6b7280]'}`}></i>
+    <i className={`fas ${icon} w-5 text-base icon-micro ${active ? 'text-emerald-400' : 'text-[#9ca3af] group-hover:text-[#6b7280]'}`}></i>
     {label}
   </button>
 );
