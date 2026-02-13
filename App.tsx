@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Supplier, Buyer, LiquidityInsight, ChatMessage, GeneratedAsset } from './types';
 import StatCard from './components/StatCard';
 import LiquidityChart from './components/LiquidityChart';
-import { getLiquidityInsights, generateOutreachPlaybook, createFounderChat, generateMarketplaceImage, generateDemandStrategy } from './services/geminiService';
+import { getLiquidityInsights, generateOutreachPlaybook, createFounderChat, generateMarketplaceImage, generateDemandStrategy, getApiKeyError } from './services/geminiService';
 
 const FOUNDER_IMAGE_URL = "https://i.postimg.cc/HjfLFvxr/1-Aries-Circular-Marketplace-Liquidity-Accelerator-(CMLA).png";
 
@@ -32,6 +32,9 @@ const App: React.FC = () => {
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatRef = useRef<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  
+  // Error State
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Initialize Chat Session
   useEffect(() => {
@@ -47,14 +50,19 @@ const App: React.FC = () => {
 
     setChatMessages(prev => [...prev, { role: 'user', text: text }]);
     setIsChatLoading(true);
+    setApiError(null);
 
     try {
-      if (chatRef.current) {
-        const response = await chatRef.current.sendMessage({ message: text });
-        setChatMessages(prev => [...prev, { role: 'model', text: response.text }]);
+      if (!chatRef.current) {
+        setChatMessages(prev => [...prev, { role: 'model', text: getApiKeyError() }]);
+        setIsChatLoading(false);
+        return;
       }
-    } catch (error) {
-      setChatMessages(prev => [...prev, { role: 'model', text: "Signal lost. Connection unstable. Stand by." }]);
+      const response = await chatRef.current.sendMessage({ message: text });
+      setChatMessages(prev => [...prev, { role: 'model', text: response.text }]);
+    } catch (error: any) {
+      const errorMessage = error?.message?.includes('API key') ? getApiKeyError() : "Signal lost. Connection unstable. Stand by.";
+      setChatMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -63,17 +71,27 @@ const App: React.FC = () => {
   const handleGenerateImage = async () => {
     if (!imagePrompt.trim()) return;
     setIsGeneratingImage(true);
-    const url = await generateMarketplaceImage(imagePrompt, selectedAspectRatio);
-    if (url) {
-      const newAsset: GeneratedAsset = {
-        id: Math.random().toString(36).substring(7),
-        url: url,
-        prompt: imagePrompt,
-        timestamp: Date.now()
-      };
-      setGeneratedAssets(prev => [newAsset, ...prev]);
+    setApiError(null);
+    try {
+      const url = await generateMarketplaceImage(imagePrompt, selectedAspectRatio);
+      if (url) {
+        const newAsset: GeneratedAsset = {
+          id: Math.random().toString(36).substring(7),
+          url: url,
+          prompt: imagePrompt,
+          timestamp: Date.now()
+        };
+        setGeneratedAssets(prev => [newAsset, ...prev]);
+      }
+    } catch (error: any) {
+      if (error?.message?.includes('API key')) {
+        setApiError(getApiKeyError());
+      } else {
+        setApiError("Failed to generate image. Please try again.");
+      }
+    } finally {
+      setIsGeneratingImage(false);
     }
-    setIsGeneratingImage(false);
   };
 
   const getStarterProbes = (view: View) => {
@@ -143,27 +161,63 @@ const App: React.FC = () => {
 
   const fetchInsights = async () => {
     setIsAnalyzing(true);
-    const result = await getLiquidityInsights(marketplaceVertical, {
-      activeSuppliers: 15,
-      activeBuyers: 12,
-      weeklyTrans: 42
-    });
-    setInsights(result);
-    setIsAnalyzing(false);
+    setApiError(null);
+    try {
+      const result = await getLiquidityInsights(marketplaceVertical, {
+        activeSuppliers: 15,
+        activeBuyers: 12,
+        weeklyTrans: 42
+      });
+      setInsights(result);
+    } catch (error: any) {
+      if (error?.message?.includes('API key')) {
+        setApiError(getApiKeyError());
+        setInsights([]);
+      } else {
+        setApiError("Failed to fetch insights. Please try again.");
+        setInsights([]);
+      }
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleGeneratePlaybook = async (role: 'Supplier' | 'Buyer') => {
     setIsGeneratingPlaybook(true);
-    const result = await generateOutreachPlaybook(role, marketplaceVertical, "Exclusive early access to secondary market volume with guaranteed buy-backs.");
-    setAiPlaybook(result);
-    setIsGeneratingPlaybook(false);
+    setApiError(null);
+    try {
+      const result = await generateOutreachPlaybook(role, marketplaceVertical, "Exclusive early access to secondary market volume with guaranteed buy-backs.");
+      setAiPlaybook(result);
+    } catch (error: any) {
+      if (error?.message?.includes('API key')) {
+        setApiError(getApiKeyError());
+        setAiPlaybook('');
+      } else {
+        setApiError("Failed to generate playbook. Please try again.");
+        setAiPlaybook('');
+      }
+    } finally {
+      setIsGeneratingPlaybook(false);
+    }
   };
 
   const handleSeedDemand = async (segment: 'Enterprise' | 'SME' | 'Direct') => {
     setIsGeneratingStrategy(true);
-    const result = await generateDemandStrategy(segment, marketplaceVertical);
-    setDemandStrategy(result);
-    setIsGeneratingStrategy(false);
+    setApiError(null);
+    try {
+      const result = await generateDemandStrategy(segment, marketplaceVertical);
+      setDemandStrategy(result);
+    } catch (error: any) {
+      if (error?.message?.includes('API key')) {
+        setApiError(getApiKeyError());
+        setDemandStrategy('');
+      } else {
+        setApiError("Failed to generate strategy. Please try again.");
+        setDemandStrategy('');
+      }
+    } finally {
+      setIsGeneratingStrategy(false);
+    }
   };
 
   const renderDashboard = () => (
@@ -220,6 +274,17 @@ const App: React.FC = () => {
           </div>
           
           <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            {apiError && (
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <i className="fas fa-exclamation-triangle text-rose-500 mt-0.5"></i>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-rose-900 mb-1">API Key Required</p>
+                    <p className="text-xs text-rose-700 leading-relaxed">{apiError}</p>
+                  </div>
+                </div>
+              </div>
+            )}
             {insights.length > 0 ? insights.map((insight, idx) => (
               <div key={idx} className="group border-b border-slate-800 pb-6 last:border-0">
                 <div className="flex items-center gap-2 mb-2">
@@ -298,6 +363,17 @@ const App: React.FC = () => {
               >
                 {isGeneratingImage ? <><i className="fas fa-circle-notch animate-spin mr-2"></i> RENDERING...</> : 'Generate Visual'}
               </button>
+              {apiError && (
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mt-4">
+                  <div className="flex items-start gap-3">
+                    <i className="fas fa-exclamation-triangle text-rose-500 mt-0.5"></i>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-rose-900 mb-1">API Key Required</p>
+                      <p className="text-xs text-rose-700 leading-relaxed">{apiError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
@@ -549,7 +625,17 @@ const App: React.FC = () => {
           </div>
 
           <div className="flex-1 bg-indigo-950/50 rounded-2xl p-6 font-mono text-xs leading-relaxed overflow-y-auto">
-            {isGeneratingStrategy ? (
+            {apiError ? (
+              <div className="bg-rose-900/50 border border-rose-700/50 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <i className="fas fa-exclamation-triangle text-rose-400 mt-0.5"></i>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-rose-300 mb-1">API Key Required</p>
+                    <p className="text-xs text-rose-200 leading-relaxed">{apiError}</p>
+                  </div>
+                </div>
+              </div>
+            ) : isGeneratingStrategy ? (
               <div className="flex items-center gap-2 animate-pulse">
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
                 <p className="text-indigo-400 font-bold">CALCULATING STRATEGY...</p>
@@ -622,6 +708,18 @@ const App: React.FC = () => {
             </button>
           </div>
           <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-6">Generated Logic</h3>
+          
+          {apiError && (
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <i className="fas fa-exclamation-triangle text-rose-500 mt-0.5"></i>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-rose-900 mb-1">API Key Required</p>
+                  <p className="text-xs text-rose-700 leading-relaxed">{apiError}</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="text-sm text-slate-700 leading-loose whitespace-pre-wrap font-medium">
             {aiPlaybook || (
@@ -1035,14 +1133,26 @@ const App: React.FC = () => {
               <div className="flex-1 h-[450px] overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
                 {chatMessages.length === 0 && (
                   <div className="space-y-4 py-2 animate-in fade-in duration-500">
-                    <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm rounded-tl-none font-medium text-slate-800 text-sm leading-relaxed">
-                      Systems are online. I'm Alex Voss. I don't care about theory—I care about liquidity. 
-                      <br/><br/>
-                      I learned circular thinking when supply chains failed in the field. Here, we move fast or we fail. What's the operational constraint?
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Operational Probes (Landing)</p>
+                    {!chatRef.current ? (
+                      <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <i className="fas fa-exclamation-triangle text-rose-500 mt-0.5"></i>
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-rose-900 mb-1">API Key Required</p>
+                            <p className="text-xs text-rose-700 leading-relaxed">{getApiKeyError()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm rounded-tl-none font-medium text-slate-800 text-sm leading-relaxed">
+                          Systems are online. I'm Alex Voss. I don't care about theory—I care about liquidity. 
+                          <br/><br/>
+                          I learned circular thinking when supply chains failed in the field. Here, we move fast or we fail. What's the operational constraint?
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Operational Probes (Landing)</p>
                       {[
                         "What's the main operational constraint right now?",
                         "How do I improve my liquidity score?",
@@ -1057,7 +1167,9 @@ const App: React.FC = () => {
                           {probe}
                         </button>
                       ))}
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -1211,25 +1323,39 @@ const App: React.FC = () => {
               <div className="flex-1 h-[450px] overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
                 {chatMessages.length === 0 && (
                   <div className="space-y-4 py-2 animate-in fade-in duration-500">
-                    <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm rounded-tl-none font-medium text-slate-800 text-sm leading-relaxed">
-                      Systems are online. I'm Alex Voss. I don't care about theory—I care about liquidity. 
-                      <br/><br/>
-                      I learned circular thinking when supply chains failed in the field. Here, we move fast or we fail. What's the operational constraint?
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Operational Probes ({currentView})</p>
-                      {getStarterProbes(currentView).map((probe, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSendMessage(probe)}
-                          className="w-full text-left bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 p-3 rounded-xl text-xs font-bold text-slate-600 hover:text-emerald-700 transition-all shadow-sm"
-                        >
-                          <i className="fas fa-arrow-right mr-2 opacity-30 text-[10px]"></i>
-                          {probe}
-                        </button>
-                      ))}
-                    </div>
+                    {!chatRef.current ? (
+                      <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <i className="fas fa-exclamation-triangle text-rose-500 mt-0.5"></i>
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-rose-900 mb-1">API Key Required</p>
+                            <p className="text-xs text-rose-700 leading-relaxed">{getApiKeyError()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm rounded-tl-none font-medium text-slate-800 text-sm leading-relaxed">
+                          Systems are online. I'm Alex Voss. I don't care about theory—I care about liquidity. 
+                          <br/><br/>
+                          I learned circular thinking when supply chains failed in the field. Here, we move fast or we fail. What's the operational constraint?
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Operational Probes ({currentView})</p>
+                          {getStarterProbes(currentView).map((probe, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleSendMessage(probe)}
+                              className="w-full text-left bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 p-3 rounded-xl text-xs font-bold text-slate-600 hover:text-emerald-700 transition-all shadow-sm"
+                            >
+                              <i className="fas fa-arrow-right mr-2 opacity-30 text-[10px]"></i>
+                              {probe}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 

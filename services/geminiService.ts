@@ -2,7 +2,27 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import { LiquidityInsight } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const API_KEY = process.env.API_KEY || '';
+const hasApiKey = API_KEY && API_KEY.trim() !== '';
+
+// Only initialize if API key is available
+let ai: GoogleGenAI | null = null;
+if (hasApiKey) {
+  try {
+    ai = new GoogleGenAI({ apiKey: API_KEY });
+  } catch (error) {
+    console.error("Failed to initialize Gemini API:", error);
+    ai = null;
+  }
+}
+
+export const checkApiKey = (): boolean => {
+  return hasApiKey;
+};
+
+export const getApiKeyError = (): string => {
+  return "Google API key is required to use this feature. Please set GEMINI_API_KEY in your environment variables or .env.local file.";
+};
 
 const FOUNDER_SYSTEM_INSTRUCTION = `
 You are Alex Voss, the founder of the Circular Marketplace Liquidity Accelerator (CMLA).
@@ -23,6 +43,9 @@ export const getLiquidityInsights = async (
   vertical: string, 
   stats: any
 ): Promise<LiquidityInsight[]> => {
+  if (!hasApiKey || !ai) {
+    throw new Error(getApiKeyError());
+  }
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -56,6 +79,9 @@ export const generateDemandStrategy = async (
   segment: 'Enterprise' | 'SME' | 'Direct',
   vertical: string
 ): Promise<string> => {
+  if (!hasApiKey || !ai) {
+    throw new Error(getApiKeyError());
+  }
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -73,6 +99,9 @@ export const generateOutreachPlaybook = async (
   targetIndustry: string,
   valueProp: string
 ): Promise<string> => {
+  if (!hasApiKey || !ai) {
+    throw new Error(getApiKeyError());
+  }
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-pro-preview",
@@ -95,6 +124,9 @@ export const generateMarketplaceImage = async (
   prompt: string,
   aspectRatio: "1:1" | "16:9" | "9:16" = "16:9"
 ): Promise<string | null> => {
+  if (!hasApiKey || !ai) {
+    throw new Error(getApiKeyError());
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
@@ -124,11 +156,19 @@ export const generateMarketplaceImage = async (
   }
 };
 
-export const createFounderChat = (): Chat => {
-  return ai.chats.create({
-    model: 'gemini-3-flash-preview',
-    config: {
-      systemInstruction: FOUNDER_SYSTEM_INSTRUCTION,
-    },
-  });
+export const createFounderChat = (): Chat | null => {
+  if (!hasApiKey || !ai) {
+    return null;
+  }
+  try {
+    return ai.chats.create({
+      model: 'gemini-3-flash-preview',
+      config: {
+        systemInstruction: FOUNDER_SYSTEM_INSTRUCTION,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    return null;
+  }
 };
