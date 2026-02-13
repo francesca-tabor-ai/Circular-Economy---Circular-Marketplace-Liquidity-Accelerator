@@ -682,7 +682,7 @@ const App: React.FC = () => {
         <div className="bg-white border border-[#e5e7eb] p-8 rounded-xl shadow-sm space-y-8">
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-[#0a2540]">Sequence Generator</h3>
-            <p className="text-sm text-[#6b7280] font-medium">Generate category-leadership focused outbound copy.</p>
+            <p className="text-sm text-[#6b7280] font-medium">Generate circular economy category-leadership focused outbound copy.</p>
           </div>
           
           <div className="space-y-6">
@@ -788,7 +788,7 @@ const App: React.FC = () => {
             Reach Marketplace Liquidity<br />Before Your Competitors Do
           </h1>
           <p className="text-xl lg:text-2xl text-white/90 font-normal max-w-3xl mx-auto leading-relaxed">
-            The liquidity acceleration platform built for venture-backed circular marketplaces racing to win category leadership.
+            The exclusive liquidity acceleration platform for circular economy marketplaces. Built for founders racing to win category leadership in the circular economy.
           </p>
           <p className="text-lg text-white/80 font-normal">
             Get from zero → consistent weekly transactions in under 90 days.
@@ -813,7 +813,7 @@ const App: React.FC = () => {
       {/* Social Proof / Positioning Strip */}
       <section className="bg-[#f6f9fc] border-y border-[#e5e7eb] py-8">
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
-          <p className="text-center text-sm font-bold text-slate-600 uppercase tracking-widest mb-4">Built for founders operating where:</p>
+          <p className="text-center text-sm font-bold text-slate-600 uppercase tracking-widest mb-4">Built exclusively for circular economy founders operating where:</p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="space-y-2">
               <i className="fas fa-puzzle-piece text-2xl text-[#9ca3af]"></i>
@@ -839,7 +839,7 @@ const App: React.FC = () => {
       <section className="max-w-4xl mx-auto px-6 lg:px-10 py-20">
         <div className="space-y-6">
           <h2 className="text-4xl font-semibold text-[#0a2540] tracking-tight">THE PROBLEM</h2>
-          <h3 className="text-3xl font-bold text-slate-800">Circular Marketplaces Don't Fail Because of Vision</h3>
+          <h3 className="text-3xl font-bold text-slate-800">Circular Economy Marketplaces Don't Fail Because of Vision</h3>
           <h4 className="text-2xl font-bold text-rose-600">They Fail Because They Never Reach Liquidity.</h4>
           <div className="bg-[#f6f9fc] border border-[#e5e7eb] rounded-xl p-8 space-y-4">
             <p className="text-lg font-bold text-slate-700">You can have:</p>
@@ -871,9 +871,9 @@ const App: React.FC = () => {
       <section className="bg-[#0a2540] text-white py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-10 space-y-8">
           <h2 className="text-4xl font-semibold tracking-tight">THE SOLUTION</h2>
-          <h3 className="text-3xl font-bold">The Circular Marketplace Liquidity Accelerator</h3>
-          <p className="text-xl font-bold text-emerald-400">We exist for one outcome:</p>
-          <p className="text-2xl font-extrabold">Consistent, repeat marketplace transactions — fast.</p>
+          <h3 className="text-3xl font-bold">The Circular Economy Marketplace Liquidity Accelerator</h3>
+          <p className="text-xl font-bold text-emerald-400">We exist exclusively for circular economy marketplaces:</p>
+          <p className="text-2xl font-extrabold">Consistent, repeat circular economy transactions — fast.</p>
           <div className="bg-[#1f2937]/50 border border-slate-700 rounded-xl p-8 space-y-4">
             <p className="text-lg font-bold">We help you:</p>
             <ul className="space-y-3">
@@ -1041,7 +1041,7 @@ const App: React.FC = () => {
               </li>
               <li className="flex items-start gap-3">
                 <i className="fas fa-times-circle text-rose-600 mt-1"></i>
-                <span className="font-medium">Marketplace SaaS templates</span>
+                <span className="font-medium">Generic marketplace SaaS templates</span>
               </li>
               <li className="flex items-start gap-3">
                 <i className="fas fa-times-circle text-rose-600 mt-1"></i>
