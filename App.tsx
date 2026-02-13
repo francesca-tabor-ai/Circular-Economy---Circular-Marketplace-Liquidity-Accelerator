@@ -196,7 +196,7 @@ const App: React.FC = () => {
     setIsGeneratingPlaybook(true);
     setApiError(null);
     try {
-    const result = await generateOutreachPlaybook(role, marketplaceVertical, "Exclusive early access to secondary market volume with guaranteed buy-backs.");
+    const result = await generateOutreachPlaybook(role, marketplaceVertical, "Exclusive early access to circular economy secondary market volume with guaranteed buy-backs.");
     setAiPlaybook(result);
     } catch (error: any) {
       if (error?.message?.includes('API key')) {
@@ -236,7 +236,7 @@ const App: React.FC = () => {
         <div>
           <h1 className="text-4xl font-semibold text-[#0a2540] tracking-tight">Marketplace Health</h1>
           <p className="text-[#6b7280] mt-2 text-lg font-medium leading-relaxed max-w-2xl">
-            Liquidity acceleration engine for <span className="text-emerald-600 font-bold">{marketplaceVertical}</span>. 
+            Circular economy liquidity acceleration engine for <span className="text-emerald-600 font-bold">{marketplaceVertical}</span>. 
             Currently at Phase 1: Rapid Supply Acquisition.
           </p>
         </div>
@@ -858,10 +858,10 @@ const App: React.FC = () => {
               </li>
             </ul>
             <p className="pt-4 text-lg font-bold text-[#0a2540] border-t border-[#e5e7eb]">
-              But if transactions don't happen fast, the market moves on.
+              But if transactions don't happen fast, the circular economy market moves on.
             </p>
             <p className="text-slate-600 font-medium">
-              Most marketplaces lose 12–24 months solving the same early-stage liquidity problems. By then, competitors exist.
+              Most circular economy marketplaces lose 12–24 months solving the same early-stage liquidity problems. By then, competitors exist.
             </p>
           </div>
         </div>
@@ -891,7 +891,7 @@ const App: React.FC = () => {
               </li>
               <li className="flex items-start gap-3">
                 <i className="fas fa-book text-emerald-400 mt-1"></i>
-                <span className="font-medium">Execute proven marketplace launch playbooks</span>
+                <span className="font-medium">Execute proven circular economy marketplace launch playbooks</span>
               </li>
             </ul>
           </div>
@@ -1087,7 +1087,7 @@ const App: React.FC = () => {
       {/* Final CTA Section */}
       <section className="bg-[#0a2540] text-white py-20">
         <div className="max-w-4xl mx-auto px-6 lg:px-10 text-center space-y-8">
-          <h2 className="text-4xl lg:text-5xl font-semibold tracking-tight">If You're Building a Circular Marketplace</h2>
+          <h2 className="text-4xl lg:text-5xl font-semibold tracking-tight">If You're Building a Circular Economy Marketplace</h2>
           <h3 className="text-3xl font-bold text-emerald-400">Speed Is Not Optional.</h3>
           <p className="text-xl font-bold">Be first to liquidity.<br />Or compete for it later.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
@@ -1120,7 +1120,7 @@ const App: React.FC = () => {
     <div className="space-y-16 animate-in fade-in slide-in-from-right-8 duration-700 pb-20">
       <div className="max-w-3xl">
         <h1 className="text-5xl font-semibold text-[#0a2540] tracking-tighter leading-[1.1]">
-          We exist for one reason: to help circular economy marketplaces reach liquidity fast.
+          We exist exclusively for one reason: to help circular economy marketplaces reach liquidity fast.
         </h1>
         <p className="mt-8 text-xl text-slate-600 leading-relaxed font-medium">
           In emerging circular markets, the first company to unlock consistent transactions usually wins. 
