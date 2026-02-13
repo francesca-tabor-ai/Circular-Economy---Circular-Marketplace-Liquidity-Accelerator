@@ -738,29 +738,41 @@ const App: React.FC = () => {
 
   const renderLanding = () => (
     <div className="min-h-screen bg-white">
-      {/* Header with Dashboard Button */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-[#e5e7eb]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex justify-end">
-          <button
-            onClick={() => setCurrentView('Dashboard')}
-            className="stripe-gradient px-6 py-3 rounded-xl text-white font-bold text-sm shadow-lg shadow-emerald-500/20 hover:opacity-90 transition-all uppercase tracking-widest flex items-center gap-2"
-          >
-            <i className="fas fa-chart-line"></i>
-            Dashboard
-          </button>
-        </div>
-      </header>
+      {/* Hero Section with Full-Page Image */}
+      <section className="relative min-h-screen flex items-center justify-center">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(https://images3.alphacoders.com/596/596454.jpg)'
+          }}
+        />
+        
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-[#0a2540]/70"></div>
+        
+        {/* Header with Dashboard Button - Overlay */}
+        <header className="absolute top-0 left-0 right-0 z-50 bg-transparent">
+          <div className="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex justify-end">
+            <button
+              onClick={() => setCurrentView('Dashboard')}
+              className="stripe-gradient px-6 py-3 rounded-xl text-white font-bold text-sm shadow-lg shadow-emerald-500/20 hover:opacity-90 transition-all uppercase tracking-widest flex items-center gap-2"
+            >
+              <i className="fas fa-chart-line"></i>
+              Dashboard
+            </button>
+          </div>
+        </header>
 
-      {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 lg:px-10 py-20 lg:py-32">
-        <div className="text-center space-y-6">
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-[#0a2540] tracking-tight leading-tight">
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-10 text-center space-y-6">
+          <h1 className="text-5xl lg:text-7xl font-semibold text-white tracking-tight leading-tight">
             Reach Marketplace Liquidity<br />Before Your Competitors Do
           </h1>
-          <p className="text-xl lg:text-2xl text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl text-white/90 font-normal max-w-3xl mx-auto leading-relaxed">
             The liquidity acceleration platform built for venture-backed circular marketplaces racing to win category leadership.
           </p>
-          <p className="text-lg text-[#6b7280] font-medium">
+          <p className="text-lg text-white/80 font-normal">
             Get from zero → consistent weekly transactions in under 90 days.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
@@ -772,7 +784,7 @@ const App: React.FC = () => {
             </button>
             <button
               onClick={() => setIsChatOpen(true)}
-              className="bg-white border-2 border-slate-900 px-8 py-4 rounded-xl text-[#0a2540] font-bold text-base hover:bg-[#f6f9fc] transition-all uppercase tracking-widest"
+              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 px-8 py-4 rounded-xl text-white font-bold text-base hover:bg-white/20 transition-all uppercase tracking-widest"
             >
               Talk to the Founder AI
             </button>
